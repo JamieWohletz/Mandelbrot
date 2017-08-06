@@ -2,7 +2,8 @@ module Util where
 
 import Prelude
 import Data.Array (concatMap, (..))
-import Math (abs, ceil)
+import Math (abs)
+import Data.Int (ceil)
 
 pixels :: Int -> Int -> Array { x :: Int, y :: Int }
 pixels width height = concatMap buildRow (0..(height - 1))
@@ -19,6 +20,12 @@ computeImaginaryPartFromY :: Number -> Number -> Number -> Number -> Number
 computeImaginaryPartFromY canvasHeight complexPlaneHeight complexPlaneBottomEdgeCoord y =
   ((y / canvasHeight) * complexPlaneHeight) + complexPlaneBottomEdgeCoord
 
-mapEscapeValueToColor :: Number -> Number -> Number
+mapEscapeValueToColor :: Number -> Number -> String
 mapEscapeValueToColor escapeCount val =
-  ceil $ abs ((val / escapeCount) * 255.0 - 255.0)
+  "rgb(" <> red <> "," <> green <> "," <> blue <> ")"
+  where
+    zeroToOne = val / escapeCount
+    normalize = show <<< ceil <<< abs
+    red = normalize (zeroToOne*66.0 - 66.0)
+    green = normalize (zeroToOne*215.0 - 215.0)
+    blue = normalize (zeroToOne*244.0 - 244.0) 

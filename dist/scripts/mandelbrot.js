@@ -26,21 +26,21 @@
     drawFractal(Util, drawPixel, w, h);
   }
 
-  function drawFractal(util, drawPixel, width, height) {
-    const MAX_ITERATIONS = 100;  
-    const { w, h } = viewportDimensions();
-    const { complexW, complexH, complexLeftEdge, complexBottomEdge } = {
-      complexW: 10,
-      complexH: 10,
-      complexLeftEdge: -2,
-      complexTopEdge: -2
-    };
-    const pixels = util.pixels(width)(height);
 
-    for (let i = 0; i < pixels.length; i++) {
-      const { x, y } = pixels[i];
-      const cReal = util.computeRealPartFromX(w)(complexW)(complexLeftEdge)(x);
-      const cImag = util.computeImaginaryPartFromY(h)(complexH)(complexBottomEdge)(y);
+  function drawFractal(util, drawPixel, canvasWidth, canvasHeight) {
+    const MAX_ITERATIONS = 100;  
+    const { complexW, complexH, complexLeftEdge, complexBottomEdge } = {
+      complexW: 2,
+      complexH: 2,
+      complexLeftEdge: -1.5,
+      complexBottomEdge: -1
+    };
+    const pixels = util.pixels(canvasWidth)(canvasHeight);
+
+    function colorMandelbrotPixel(pixelIndex) {
+      const { x, y } = pixels[pixelIndex];
+      const cReal = util.computeRealPartFromX(canvasWidth)(complexW)(complexLeftEdge)(x);
+      const cImag = util.computeImaginaryPartFromY(canvasHeight)(complexH)(complexBottomEdge)(y);
 
       let zReal = 0;
       let zImag = 0;
@@ -57,11 +57,17 @@
         iterations += 1;
       }
       
-      const tint = util.mapEscapeValueToColor(MAX_ITERATIONS)(iterations);
-      const color = `rgb(${tint}, ${tint}, ${tint})`;
+      const color = util.mapEscapeValueToColor(MAX_ITERATIONS)(iterations);
 
       drawPixel(x, y, color);
+      if (pixelIndex < pixels.length) {
+        setImmediate(() => colorMandelbrotPixel(pixelIndex + 1));
+      } else {
+        console.log('Done');
+      }
     }
+
+    setImmediate(() => colorMandelbrotPixel(0));
   }
 
   main();
